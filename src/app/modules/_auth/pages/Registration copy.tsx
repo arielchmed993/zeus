@@ -63,12 +63,10 @@ export function Registration() {
 				saveAuth(auth)
 				const { data: user } = await backyService.auth.verifyToken()
 				setCurrentUser(user)
-				console.log(auth.data.message)
-				console.log(values)
 			} catch (error) {
-				console.error(error.response.data.message)
+				console.error(error)
 				saveAuth(undefined)
-				setStatus('The registration details is incorrect. Error Details: ' + error.response.data.message)
+				setStatus('The registration details is incorrect')
 				setSubmitting(false)
 				setLoading(false)
 			}

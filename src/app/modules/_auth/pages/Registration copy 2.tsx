@@ -8,6 +8,7 @@ import { toAbsoluteUrl } from '../../../../_zeus/helpers'
 import { PasswordMeterComponent } from '../../../../_zeus/assets/ts/components'
 import { useAuth } from '@zeus/@hooks/auth/useAuth.tsx'
 import { backyService } from '@zeus/@services/api'
+import { registerRequest } from '@zeus/@services/api/requests/auth'
 
 const initialValues = {
 	firstname: '',
@@ -52,7 +53,6 @@ export function Registration() {
 		validationSchema: registrationSchema,
 		onSubmit: async (values, { setStatus, setSubmitting }) => {
 			setLoading(true)
-
 			try {
 				const { data: auth } = await backyService.auth.register(
 					values.email,
@@ -61,14 +61,17 @@ export function Registration() {
 					values.password,
 				)
 				saveAuth(auth)
-				const { data: user } = await backyService.auth.verifyToken()
-				setCurrentUser(user)
-				console.log(auth.data.message)
+				//const { data: user } = await backyService.auth.verifyToken()
+				const { data: user } = user => axios.post(`${import.meta.env.VITE_APP_API_URL}/auth/register`, user)
+				const res = registerRequest(user.data)
+				setCurrentUser(res.data)
 				console.log(values)
+				console.log(res.data)
+
 			} catch (error) {
-				console.error(error.response.data.message)
+				console.error(error)
 				saveAuth(undefined)
-				setStatus('The registration details is incorrect. Error Details: ' + error.response.data.message)
+				setStatus(`The registration details is incorrect. Error Details: ${error.data.message}`)
 				setSubmitting(false)
 				setLoading(false)
 			}
